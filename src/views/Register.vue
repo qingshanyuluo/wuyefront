@@ -1,0 +1,111 @@
+<template>
+  <div>
+    <el-form ref="loginForm" :model="form" :rules="rules" label-width="80px" class="login-box">
+      <h3 class="login-title">用户注册</h3>
+      <el-form-item label="账号" prop="username" class="username">
+        <el-input type="text" placeholder="请输入账号" v-model="form.username"/>
+      </el-form-item>
+      <el-form-item label="密码" prop="password" class="password">
+        <el-input type="password" placeholder="请输入密码" v-model="form.password"/>
+      </el-form-item>
+      <el-form-item label="确认密码" prop="password" class="password">
+        <el-input type="password" placeholder="请确认密码" v-model="form.password"/>
+      </el-form-item>
+      <el-form-item class="submit">
+        <el-button type="primary" v-on:click="onSubmit()">注册新用户</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-dialog
+      title="温馨提示"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :before-close="handleClose">
+      <span>请输入账号和密码</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Register',
+  data () {
+    return {
+      form: {
+        username: '',
+        password: ''
+      },
+      // 表单验证，需要在 el-form-item 元素中增加 prop 属性
+      rules: {
+        username: [
+          { required: true, message: '账号不可为空', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '密码不可为空', trigger: 'blur' }
+        ]
+      },
+
+      // 对话框显示和隐藏
+      dialogVisible: false
+    }
+  },
+  methods: {
+    onSubmit () {
+      var _this = this
+      let param = new URLSearchParams()
+      param.append('name', this.form.username)
+      param.append('pwd', this.form.password)
+      this.$axios.post('/register', param)
+        .then(function (response) {
+          console.info(response.data)
+          _this.$alert('注册成功', '提示', {})
+          _this.$router.push('/login')
+        })
+        .catch(function (error) {
+          _this.$alert('注册失败', '提示', {})
+          console.info('dds' + error)
+          this.dialogVisible = true
+          return false
+        })
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+  .login-box {
+    border: 1px solid #DCDFE6;
+    width: 350px;
+    margin: 180px auto;
+    padding: 35px 35px 15px 55px;
+    border-radius: 7px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    box-shadow: 0 0 25px #909399;
+  }
+
+  .login-title {
+    // text-align: center;
+    margin: 0 auto 40px auto;
+    color: #303133;
+    font-family: "PingFang SC";
+    font-size: 25px;
+  }
+
+  .username {
+    margin: 5%;
+    margin-inline-end: 20%;
+  }
+
+  .password {
+    margin: 5%;
+    margin-inline-end: 20%;
+  }
+
+  .submit {
+    margin-inline-end: 24%;
+  }
+</style>
